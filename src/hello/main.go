@@ -2,29 +2,42 @@ package main
 
 import (
     "fmt"
-    "os"
-    "errors"
 )
 
-var ( errorEmptyString = errors.New("Unwilling to print an empty string") )
+func emit(c chan string) {
+  words := []string{"The", "quick", "brown", "fox"}
 
-func printer(msg string) error {
-  if msg == "" {
-    return errorEmptyString
+  for _, word := range words {
+    c <- word
   }
-  _, err := fmt.Println("%s\n", msg)
-  return err
+
+  close(c)
+}
+
+func makeId(c chan int) {
+  var id int
+  id = 0
+
+  for {
+    c <- id
+    id += 1
+  }
 }
 
 func main() {
-  if err := printer(""); err != nil {
-    if err == errorEmptyString {
-      fmt.Printf("You tried to print an empty string\n")
-    } else {
-      fmt.Printf("printer failed: %s\n",err)
-    }
-    os.Exit(1)
+  wordChannel := make(chan string)
+  idChannel := make(chan int)
+  
+  // concurrently run emit
+  go emit(wordChannel)
+  go makeId(idChannel)
 
-  }
+  // word := <- wordChannel
 
+  // fmt.Printf("%s ", word)
+  // fmt.Println()
+
+  fmt.Printf("%d\n", <- idChannel)
+  fmt.Printf("%d\n", <- idChannel)
+  fmt.Printf("%d\n", <- idChannel)
 }
