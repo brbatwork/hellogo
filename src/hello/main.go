@@ -25,23 +25,41 @@ func getPage(url string) (int, error) {
 
 }
 
-func getter(url string, size chan string) {
-  pageLength, err := getPage(url)
+func worker(urlCh chan string, sizeCh chan string, id int) {
+  for {
+    url := <- urlCh
+    pageLength, err := getPage(url)
 
-  if err == nil {
-    size <- fmt.Sprintf("%s has length %d\n", url, pageLength)
+    if err != nil {
+      sizeCh <- fmt.Sprintf("Error getting %s: %s", url, err)
+    } else {
+      sizeCh <- fmt.Sprintf("Worker #%d: %s has length %d\n", id, url, pageLength)
+    }
   }
+
+}
+
+func generator(url string, urlCh chan string) {
+  urlCh <- url
 }
 
 func main() {
   urls := []string {"http://www.yahoo.com", "http://www.google.com", "http://www.apple.com", "http://bbc.co.uk"}
-  size := make(chan string)
+  
+  urlCh := make(chan string)
+  sizeCh := make(chan string)
+
+  for i := 0; i < 10; i++ {
+    go worker(urlCh, sizeCh, i)
+  }
+
 
   for _, url := range urls {
-    go getter(url, size)
+    go generator(url, urlCh)
   }
 
-  for i := 0; i < len(urls); i++ {
-    fmt.Printf("%s\n", <- size)    
+  for i :=0; i < len(urls); i++ {
+    fmt.Printf("%s\n", <- sizeCh)
   }
+
 }
