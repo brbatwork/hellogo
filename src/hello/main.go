@@ -2,47 +2,46 @@ package main
 
 import (
     "fmt"
-    "time"
+    "io/ioutil"
+    "net/http"
 )
 
-func emit(chanChannel chan chan string, done chan bool) {
-  wordChannel := make(chan string)
-  chanChannel <- wordChannel
-  words := []string{"The", "quick", "brown", "fox"}
-  i := 0
+func getPage(url string) (int, error) {
+  resp, err := http.Get(url)
 
-  defer close(wordChannel)
+  if err != nil {
+    return 0, err
+  }
 
-  t := time.NewTimer(3 * time.Second)
+  defer resp.Body.Close()
 
-  for {
-    select {
-    case wordChannel <- words[i]:
-      i += 1
-      if i == len(words) {
-        i = 0
-      }
-    case <- done:
-      fmt.Println("Received done message")
-      close(done)
-      return
-    case <- t.C:
-      return
-    }
+  body, err := ioutil.ReadAll(resp.Body)
+
+  if err != nil {
+    return 0, err
+  }
+
+  return len(body), nil
+
+}
+
+func getter(url string, size chan string) {
+  pageLength, err := getPage(url)
+
+  if err == nil {
+    size <- fmt.Sprintf("%s has length %d\n", url, pageLength)
   }
 }
 
 func main() {
-  channelCh := make(chan chan string)
-  doneChannel := make(chan bool)
-  
-  // concurrently run emit
-  go emit(channelCh, doneChannel)
+  urls := []string {"http://www.yahoo.com", "http://www.google.com", "http://www.apple.com", "http://bbc.co.uk"}
+  size := make(chan string)
 
-  wordChannel := <- channelCh
-
-  for word := range wordChannel {
-    fmt.Printf("%s ", word)
+  for _, url := range urls {
+    go getter(url, size)
   }
 
+  for i := 0; i < len(urls); i++ {
+    fmt.Printf("%s\n", <- size)    
+  }
 }
