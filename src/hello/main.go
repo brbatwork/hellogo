@@ -5,31 +5,18 @@ import (
     "os"
 )
 
-func printer(words []string) {
-  for _, word := range words {
-    fmt.Printf("%s", word)
+func printer(msg string) error {
+  if msg == "" {
+    return fmt.Errorf("Unwilling to print an empty string")
   }
-  fmt.Println()
+  _, err := fmt.Println("%s\n", msg)
+  return err
 }
 
 func main() {
-  f, err := os.Open("test.txt")
-
-  if err != nil {
-    fmt.Printf("%s\n", err)
+  if err := printer(""); err != nil {
+    fmt.Printf("printer failed: %s\n",err)
     os.Exit(1)
   }
-
-  defer f.Close()
-
-  b := make([]byte, 100)
-
-  n ,err := f.Read(b)
-
-  fmt.Printf("%d: % x\n", n, b)
-
-  // Convert to string
-  stringOut := string(b)
-  fmt.Println(stringOut)
 
 }
