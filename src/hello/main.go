@@ -4,40 +4,35 @@ import (
     "fmt"
 )
 
-func emit(c chan string) {
+func emit(wordChannel chan string, done chan bool) {
   words := []string{"The", "quick", "brown", "fox"}
-
-  for _, word := range words {
-    c <- word
-  }
-
-  close(c)
-}
-
-func makeId(c chan int) {
-  var id int
-  id = 0
+  i := 0
 
   for {
-    c <- id
-    id += 1
+    select {
+    case wordChannel <- words[i]:
+      i += 1
+      if i == len(words) {
+        i = 0
+      }
+    case <- done:
+      fmt.Println("Received done message")
+      close(done)
+      return
+    }
   }
 }
 
 func main() {
   wordChannel := make(chan string)
-  idChannel := make(chan int)
+  doneChannel := make(chan bool)
   
   // concurrently run emit
-  go emit(wordChannel)
-  go makeId(idChannel)
+  go emit(wordChannel, doneChannel)
 
-  // word := <- wordChannel
+  for i := 0; i < 100; i++ {
+    fmt.Printf("%s ", <- wordChannel)
+  }
 
-  // fmt.Printf("%s ", word)
-  // fmt.Println()
-
-  fmt.Printf("%d\n", <- idChannel)
-  fmt.Printf("%d\n", <- idChannel)
-  fmt.Printf("%d\n", <- idChannel)
+  doneChannel <- true
 }
