@@ -2,11 +2,18 @@ package main
 
 import (
     "fmt"
+    "time"
 )
 
-func emit(wordChannel chan string, done chan bool) {
+func emit(chanChannel chan chan string, done chan bool) {
+  wordChannel := make(chan string)
+  chanChannel <- wordChannel
   words := []string{"The", "quick", "brown", "fox"}
   i := 0
+
+  defer close(wordChannel)
+
+  t := time.NewTimer(3 * time.Second)
 
   for {
     select {
@@ -19,20 +26,23 @@ func emit(wordChannel chan string, done chan bool) {
       fmt.Println("Received done message")
       close(done)
       return
+    case <- t.C:
+      return
     }
   }
 }
 
 func main() {
-  wordChannel := make(chan string)
+  channelCh := make(chan chan string)
   doneChannel := make(chan bool)
   
   // concurrently run emit
-  go emit(wordChannel, doneChannel)
+  go emit(channelCh, doneChannel)
 
-  for i := 0; i < 100; i++ {
-    fmt.Printf("%s ", <- wordChannel)
+  wordChannel := <- channelCh
+
+  for word := range wordChannel {
+    fmt.Printf("%s ", word)
   }
 
-  doneChannel <- true
 }
