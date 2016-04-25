@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "os"
 )
 
 func printer(words []string) {
@@ -12,11 +13,23 @@ func printer(words []string) {
 }
 
 func main() {
-  words := make([]string, 4)
-  words[0] = "the"
-  words[1] = "quick"
-  words[2] = "Brown"
-  words[3] = "Fox"
-  printer(words)
+  f, err := os.Open("test.txt")
+
+  if err != nil {
+    fmt.Printf("%s\n", err)
+    os.Exit(1)
+  }
+
+  defer f.Close()
+
+  b := make([]byte, 100)
+
+  n ,err := f.Read(b)
+
+  fmt.Printf("%d: % x\n", n, b)
+
+  // Convert to string
+  stringOut := string(b)
+  fmt.Println(stringOut)
 
 }
