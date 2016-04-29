@@ -45,7 +45,7 @@ func generator(url string, urlCh chan string) {
 
 func main() {
   urls := []string {"http://www.yahoo.com", "http://www.google.com", "http://www.apple.com", "http://bbc.co.uk"}
-  
+
   urlCh := make(chan string)
   sizeCh := make(chan string)
 
