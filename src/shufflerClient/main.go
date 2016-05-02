@@ -42,7 +42,7 @@ func main() {
   fmt.Printf("%v\n", is)
 
   ss := stringSlice{weightString{100, "hello"}, weightString{200, "world"}, weightString{10, "goodbye"}}
-  shuffler.Shuffle(ss)
+  // shuffler.Shuffle(ss)
   fmt.Printf("%v\n", ss)
   shuffler.WeightedShuffle(ss)
   fmt.Printf("%v\n", ss)
