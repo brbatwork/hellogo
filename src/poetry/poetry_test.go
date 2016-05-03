@@ -38,25 +38,37 @@ func TestNumLines(t *testing.T) {
 
 func TestStats(t *testing.T) {
     emptyPoem := Poem{}
-    v, c := emptyPoem.Stats()
+    v, c, puncs := emptyPoem.Stats()
 
-    if v != 0 || c != 0 {
+    if v != 0 || c != 0 || puncs != 0 {
       t.Fatalf("Bad number of vowels or consonants")
     }
 
     p := Poem{{"Hello"}}
-    v, c = p.Stats()
+    v, c, puncs = p.Stats()
 
     if v != 2 || c != 3 {
       t.Fatalf("Bad number of vowels or consonants")
     }
 
     p = Poem{{"Hello, world!"}}
-    v, c = p.Stats()
+    v, c, puncs = p.Stats()
 
-    if v != 3 || c != 7 {
+    if v != 3 || c != 8 {
       t.Fatalf("Bad number of vowels or consonants v: %d c: %d", v,c)
     }
+}
 
+func TestNumWords(t *testing.T) {
+  p := Poem{}
+  if p.NumWords() != 0 {
+    t.Fatalf("Empty poem should not have any words")
+  }
+
+    p = Poem{{"Hello, world!"}}
+
+    if p.NumWords() != 2 {
+      t.Fatalf("Wrong number of words found %d expected 2", p.NumWords())
+    }
 }
 

@@ -4,6 +4,7 @@ import (
     "unicode"
     "fmt"
     "os"
+    "strings"
     "bufio"
 )
 type Line string
@@ -60,6 +61,18 @@ func (p Poem) NumLines() (count int) {
     count += s.NumLines()
   }
   return
+}
+
+func (p Poem) NumWords() int {
+  results := 0
+  for _, s := range p {
+    for _, l := range s {
+      sl := string(l) // cast Line to a string excplicitly
+      parts := strings.Split(sl, " ")
+      results += len(parts)
+    }
+  }
+  return results
 }
 
 func (p Poem) Stats() (numVowels, numConsonants int, numPuncs int) {
