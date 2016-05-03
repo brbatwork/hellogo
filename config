@@ -1,0 +1,5 @@
+{
+"addr":":7070",
+"route":"/poem",
+"valid":["wordsworth", "theprelude"]
+}
