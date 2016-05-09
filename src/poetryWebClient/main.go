@@ -6,6 +6,7 @@ import (
     "net/http"
     "os"
     "sync"
+    "log"
     "poetry"
 )
 
@@ -42,6 +43,7 @@ func poemHandler(w http.ResponseWriter, r *http.Request) {
     return
   }
 
+  log.Printf("User has requested poem %s", poemName)
   // sort.Sort(p[0])
   pwt := poemWithTitle{poemName, p, p.NumWords(), p.NumThe()}
   enc := json.NewEncoder(w)
@@ -52,8 +54,7 @@ func main() {
   configFile, err := os.Open("config")
 
   if err != nil {
-    fmt.Println("Error can't find config file")
-    os.Exit(1)
+    log.Fatalf("Error can't find config file")
   }
 
   dec := json.NewDecoder(configFile)
@@ -61,8 +62,7 @@ func main() {
   configFile.Close()
 
   if err != nil {
-    fmt.Printf("Error decoding configFile %s", err)
-    os.Exit(1)
+    log.Fatalf("Error decoding configFile %s", err)
   }
 
   cache = make(map[string]poetry.Poem)
@@ -78,8 +78,7 @@ func main() {
       cache[n], err = poetry.LoadPoem(n)
       cacheMutex.Unlock()
       if err != nil {
-        fmt.Printf("Error loading poem %s", n)
-        os.Exit(1)
+        log.Fatalf("Error loading poem %s", n)
       }
       wg.Done()
     }(name)
