@@ -5,6 +5,7 @@ import (
     "encoding/json"
     "net/http"
     "os"
+    "sort"
     "poetry"
 )
 
@@ -51,6 +52,7 @@ func poemHandler(w http.ResponseWriter, r *http.Request) {
     http.Error(w, fmt.Sprintf(`{"Error":"Program not found"}`), http.StatusNotFound)
   } else {
     // fmt.Fprintf(w, "%v\n", p) // as a string
+    sort.Sort(p[0])
     pwt := poemWithTitle{poemName, p, p.NumWords(), p.NumThe()}
     enc := json.NewEncoder(w)
     enc.Encode(pwt)

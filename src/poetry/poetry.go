@@ -48,6 +48,21 @@ func LoadPoem(location string) (Poem, error) {
   return p, nil
 }
 
+// BEGIN SORT INTERFACE
+func (s Stanza) Len() int {
+  return len(s)
+}
+
+func (s Stanza) Swap(i, j int) {
+  s[i], s[j] = s[j], s[i]
+}
+
+func (s Stanza) Less(i, j int) bool {
+  return len(s[i]) < len(s[j])
+}
+
+// END SORT INTERFACE
+
 func (p Poem) NumStanzas() int {
   return len(p)
 }
