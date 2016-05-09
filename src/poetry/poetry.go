@@ -75,6 +75,19 @@ func (p Poem) NumWords() int {
   return results
 }
 
+func (p Poem) NumThe() int {
+  results := 0
+  for _, s := range p {
+    for _, l := range s {
+      sl := string(l) // cast Line to a string excplicitly
+      if strings.Contains(sl, "the") {
+        results += 1
+      }
+    }
+  }
+  return results
+}
+
 func (p Poem) Stats() (numVowels, numConsonants int, numPuncs int) {
   for _, stan := range p {
     for _, line := range stan {

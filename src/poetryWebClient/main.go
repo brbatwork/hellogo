@@ -20,6 +20,7 @@ type poemWithTitle struct {
   Title string
   Body poetry.Poem
   WordCount int
+  TheCount int
 }
 
 func poemHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +51,7 @@ func poemHandler(w http.ResponseWriter, r *http.Request) {
     http.Error(w, fmt.Sprintf(`{"Error":"Program not found"}`), http.StatusNotFound)
   } else {
     // fmt.Fprintf(w, "%v\n", p) // as a string
-    pwt := poemWithTitle{poemName, p, p.NumWords()}
+    pwt := poemWithTitle{poemName, p, p.NumWords(), p.NumThe()}
     enc := json.NewEncoder(w)
     enc.Encode(pwt)
   }

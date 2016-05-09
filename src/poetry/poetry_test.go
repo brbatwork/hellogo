@@ -72,3 +72,15 @@ func TestNumWords(t *testing.T) {
     }
 }
 
+func TestNumThe(t *testing.T) {
+  p := Poem{}
+  if p.NumThe() != 0 {
+    t.Fatalf("Empty poem should not have any the words")
+  }
+
+    p = Poem{{"the Hello, world example!"}}
+
+    if p.NumThe() != 1 {
+      t.Fatalf("Wrong number of the words found %d expected 1", p.NumThe())
+    }
+}
