@@ -5,9 +5,10 @@ import (
     "encoding/json"
     "net/http"
     "os"
-    "sort"
     "poetry"
 )
+
+var cache map[string]poetry.Poem
 
 type config struct {
   Route string
@@ -32,31 +33,17 @@ func poemHandler(w http.ResponseWriter, r *http.Request) {
   }
 
   poemName := r.Form["name"][0]
-  var found bool
+  p, ok := cache[poemName]
 
-  for _, v := range  c.ValidPoems {
-    if v == poemName {
-      found = true
-      break
-    }
-  }
-
-  if !found {
-    http.Error(w, fmt.Sprintf(`{"Error":"Program not found"}`), http.StatusNotFound)
+  if !ok {
+    http.Error(w, fmt.Sprintf(`{"Error":"Poem %s not found"}`, poemName), http.StatusNotFound)
     return
   }
 
-  p, err := poetry.LoadPoem(poemName)
-
-  if err != nil {
-    http.Error(w, fmt.Sprintf(`{"Error":"Program not found"}`), http.StatusNotFound)
-  } else {
-    // fmt.Fprintf(w, "%v\n", p) // as a string
-    sort.Sort(p[0])
-    pwt := poemWithTitle{poemName, p, p.NumWords(), p.NumThe()}
-    enc := json.NewEncoder(w)
-    enc.Encode(pwt)
-  }
+  // sort.Sort(p[0])
+  pwt := poemWithTitle{poemName, p, p.NumWords(), p.NumThe()}
+  enc := json.NewEncoder(w)
+  enc.Encode(pwt)
 }
 
 func main() {
@@ -74,6 +61,18 @@ func main() {
   if err != nil {
     fmt.Printf("Error decoding configFile %s", err)
     os.Exit(1)
+  }
+
+  cache = make(map[string]poetry.Poem)
+
+  // Load the in memory cache
+  for _, name := range c.ValidPoems {
+    fmt.Printf("Loading poem %s into cache\n", name)
+    cache[name], err = poetry.LoadPoem(name)
+    if err != nil {
+      fmt.Printf("Error loading poem %s", name)
+      os.Exit(1)
+    }
   }
 
   fmt.Printf("Route: %s, BindAddress: %s\n", c.Route, c.BindAddress)
