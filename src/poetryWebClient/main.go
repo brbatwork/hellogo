@@ -5,9 +5,11 @@ import (
     "encoding/json"
     "net/http"
     "os"
+    "sync"
     "poetry"
 )
 
+var cacheMutex sync.Mutex
 var cache map[string]poetry.Poem
 
 type config struct {
@@ -64,17 +66,27 @@ func main() {
   }
 
   cache = make(map[string]poetry.Poem)
+  var wg sync.WaitGroup
 
   // Load the in memory cache
   for _, name := range c.ValidPoems {
-    fmt.Printf("Loading poem %s into cache\n", name)
-    cache[name], err = poetry.LoadPoem(name)
-    if err != nil {
-      fmt.Printf("Error loading poem %s", name)
-      os.Exit(1)
-    }
+    //async load the poems
+    wg.Add(1)
+    go func(n string) {
+      fmt.Printf("Loading poem %s into cache\n", n)
+      cacheMutex.Lock()
+      cache[n], err = poetry.LoadPoem(n)
+      cacheMutex.Unlock()
+      if err != nil {
+        fmt.Printf("Error loading poem %s", n)
+        os.Exit(1)
+      }
+      wg.Done()
+    }(name)
+
   }
 
+  wg.Wait() // Wait for all the poems to be loaded
   fmt.Printf("Route: %s, BindAddress: %s\n", c.Route, c.BindAddress)
   http.HandleFunc(c.Route, poemHandler)
   http.ListenAndServe(c.BindAddress, nil)
