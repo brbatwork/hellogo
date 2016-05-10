@@ -7,6 +7,7 @@ import (
     "os"
     "sync"
     "log"
+    "flag"
     "poetry"
 )
 
@@ -51,7 +52,10 @@ func poemHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-  configFile, err := os.Open("config")
+
+  configFileName := flag.String("conf", "config", "Name of configuration file")
+  flag.Parse()
+  configFile, err := os.Open(*configFileName)
 
   if err != nil {
     log.Fatalf("Error can't find config file")
