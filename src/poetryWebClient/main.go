@@ -8,6 +8,7 @@ import (
     "sync"
     "log"
     "flag"
+    "time"
     "poetry"
 )
 
@@ -72,6 +73,8 @@ func main() {
   cache = make(map[string]poetry.Poem)
   var wg sync.WaitGroup
 
+  startTime := time.Now()
+
   // Load the in memory cache
   for _, name := range c.ValidPoems {
     //async load the poems
@@ -90,7 +93,9 @@ func main() {
   }
 
   wg.Wait() // Wait for all the poems to be loaded
-  fmt.Printf("Route: %s, BindAddress: %s\n", c.Route, c.BindAddress)
+  elapsedTime := time.Since(startTime)
+
+  log.Printf("Statup complete in %s Route: %s, BindAddress: %s\n", elapsedTime, c.Route, c.BindAddress)
   http.HandleFunc(c.Route, poemHandler)
   http.ListenAndServe(c.BindAddress, nil)
 }
