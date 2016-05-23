@@ -5,10 +5,34 @@ import (
   "io"
   "fmt"
   "sync"
+  "flag"
   "os"
 )
 
+var Version = "1.0.0"
 var ActorNames = []string{}
+var Usage = func() {
+  fmt.Fprintf(os.Stderr, `
+NAME:
+    imdbSearcher - What were they in together?
+
+USAGE:
+    imdbSearcher [options] [actor names...]
+
+EXAMPLE:
+    imdbSearcher "Lee Majors" "Sally Fields"
+
+VERSION:
+  %s
+
+COMMANDS:
+  help, h Shows a list of commands
+
+OPTIONS:
+`, Version)
+
+  flag.PrintDefaults()
+}
 
 func Run(in stringReader, out io.Writer) {
   ActorNames = []string{}
@@ -57,5 +81,14 @@ func Run(in stringReader, out io.Writer) {
 
 
 func main() {
+  version := flag.Bool("version", false, "display the version number")
+  flag.Usage = Usage
+  flag.Parse()
+
+  if *version {
+    fmt.Printf("Version %s\n", Version)
+    os.Exit(1)
+  }
+  ActorNames = flag.Args()
   Run(bufio.NewReader(os.Stdin), os.Stdout)
 }
