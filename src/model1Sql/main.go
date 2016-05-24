@@ -10,7 +10,7 @@ _  "github.com/lib/pq"
 type Todo struct {
   Id int
   Subject string
-  DueDate time.Time `db:"due_date"`
+  DueDate *time.Time `db:"due_date"`
   IsComplete bool   `db:"is_complete"`
 }
 
@@ -29,7 +29,7 @@ func main() {
   t := Todo {
     Id: currId + 1,
     Subject: "Mow Lawn",
-    DueDate: now,
+    DueDate: &now,
     IsComplete: false,
   }
 
