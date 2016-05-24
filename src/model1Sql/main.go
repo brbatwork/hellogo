@@ -7,6 +7,13 @@ _  "github.com/lib/pq"
   "log"
 )
 
+type Todo struct {
+  id int
+  subject string
+  dueDate time.Time
+  isComplete bool
+}
+
 func main() {
   db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost/playground?sslmode=disable")
   if err != nil {
@@ -29,18 +36,19 @@ func main() {
 
   affected, _ := res.RowsAffected()
   log.Printf("Rows affected %d\n", affected)
-  var subject string
 
-  rows, err := db.Query("select subject from todos")
+  rows, err := db.Query("select * from todos")
   if err != nil {
     log.Fatal(err)
   }
 
   for rows.Next() {
-    err = rows.Scan(&subject)
+    todo := Todo{}
+
+    err = rows.Scan(&todo.id, &todo.subject, &todo.dueDate, &todo.isComplete)
     if err != nil {
       log.Fatal(err)
     }
-    log.Printf("Subject is %s\n", subject)
+    log.Printf("Id %d: subject is %s\n", todo.id, todo.subject)
   }
 }
