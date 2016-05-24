@@ -2,6 +2,7 @@ package main
 
 import (
   "github.com/jmoiron/sqlx"
+  "github.com/markbates/going/nulls"
 _  "github.com/lib/pq"
   "time"
   "log"
@@ -10,7 +11,7 @@ _  "github.com/lib/pq"
 type Todo struct {
   Id int
   Subject string
-  DueDate *time.Time `db:"due_date"`
+  DueDate nulls.Time `db:"due_date"`
   IsComplete bool   `db:"is_complete"`
 }
 
@@ -24,12 +25,12 @@ func main() {
   var currId int
   currIdRow := db.QueryRow("select max(id) from todos")
   err = currIdRow.Scan(&currId)
-  now := time.Now()
+  now := nulls.Time{Time: time.Now(), Valid: true}
 
   t := Todo {
     Id: currId + 1,
     Subject: "Mow Lawn",
-    DueDate: &now,
+    DueDate: now,
     IsComplete: false,
   }
 
