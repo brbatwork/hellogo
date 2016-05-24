@@ -10,8 +10,8 @@ _  "github.com/lib/pq"
 type Todo struct {
   Id int
   Subject string
-  DueDate time.Time
-  IsComplete bool
+  DueDate time.Time `db:"due_date"`
+  IsComplete bool   `db:"is_complete"`
 }
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
   }
 
   todos := []Todo{}
-  db.Select(&todos, "select id, subject, due_date AS DueDate, is_complete AS IsComplete from todos")
+  db.Select(&todos, "select * from todos")
 
   for _, todo := range todos {
     log.Printf("Id %d: subject is %s\n", todo.Id, todo.Subject)
