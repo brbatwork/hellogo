@@ -6,6 +6,7 @@ import (
   "os"
   "errors"
   "encoding/json"
+  "strconv"
   "github.com/boltdb/bolt"
 )
 
@@ -84,4 +85,30 @@ func main() {
     return nil
   })
 
+  db.Update(func(tx *bolt.Tx) error {
+    b, err := tx.CreateBucketIfNotExists(bucketName)
+    if err != nil {
+      return err
+    }
+    for i := 0; i < 10; i++ {
+      b.Put([]byte(fmt.Sprintf("key-%d", i)), []byte(strconv.Itoa(i)))
+    }
+    return err
+  })
+
+  db.View(func(tx *bolt.Tx) error {
+    b := tx.Bucket(bucketName)
+    // Using for each
+    b.ForEach(func(k []byte, v []byte) error {
+      fmt.Printf("%s = %s\n", k,v)
+      return nil
+    })
+
+    // using cursors
+    c := b.Cursor()
+    for k,v := c.First(); k != nil; k, v = c.Next() {
+      fmt.Printf("%s = %s\n", k,v)
+    }
+    return nil
+  })
 }
