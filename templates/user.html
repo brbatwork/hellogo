@@ -1,0 +1,18 @@
+<p>
+  <b>Name:</b> {{.FirstName}} {{.LastName}}
+</p>
+<p>
+  <b>Email:</b> {{.Email}}
+</p>
+<p>
+  <b>Age:</b> {{.Age}}
+</p>
+
+<a href='/user?email={{.Email}}'>Auto escape example</a>
+{{.}} <!-- No escaping -->
+<script>
+// Context aware escaping now in JSON format
+var user = {{.}}
+</script>
+
+{{ template "file3.html" . }}
