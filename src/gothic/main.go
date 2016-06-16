@@ -29,10 +29,10 @@ func main() {
   )
   p := pat.New()
   p.Get("/", func(resp http.ResponseWriter, req *http.Request) {
-    r.HTML(resp, 200, "index", nil)
+    r.HTML(resp, http.StatusOK, "index", nil)
   })
 
-  p.Get("/auth/{provider}", func (resp http.ResponseWriter, req *http.Request) {
+  p.Get("/auth/{provider}", func(resp http.ResponseWriter, req *http.Request) {
     providerName := req.URL.Query().Get(":provider")
     log.Println("Handling a request to provider: ", providerName)
     provider, err := goth.GetProvider(providerName)
@@ -62,10 +62,11 @@ func main() {
     }
 
     http.Redirect(resp, req, url, http.StatusFound)
-
-    p.Get("/auth/{provider}/callback", func (resp http.ResponseWriter, req *http.Request) {
-      fmt.Fprintf(resp, "Hello!")
-    })
   })
+
+  p.Get("/auth/{provider}/callback", func(resp http.ResponseWriter, req *http.Request) {
+    fmt.Fprintf(resp, "Hello!")
+  })
+
   http.ListenAndServe(":4000", p)
 }
