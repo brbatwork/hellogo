@@ -1,0 +1,15 @@
+{{ set . "title" "Todos" }}
+{{ template "header.html" . }}
+<div class="container">
+<ul>
+  {{ range .ts }}
+    <li>
+      <a href="/todos/{{.ID}}">
+        <h4>{{.Subject}}</h4>
+      </a>
+      <p>{{.Description}}</p>
+    </li>
+  {{ end }}
+</ul>
+</div>
+{{ template "footer.html" . }}
