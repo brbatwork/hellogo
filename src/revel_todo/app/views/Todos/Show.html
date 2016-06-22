@@ -9,5 +9,6 @@
 <p>
   <b>Updated {{ .t.UpdatedAt }}</b>
 </p>
+<a href="/todos/{{ .t.ID }}/edit">Edit Todo</a>
 </div>
 {{ template "footer.html" . }}

@@ -1,0 +1,21 @@
+{{ if .errors }}
+  <h3>Please fix the errors below</h3>
+{{ end }}
+<p>
+  {{ with $field := field "t.Subject" . }}
+  Subject: <br><input name="t.Subject" placeholder="subject" value="{{ $field.Value}}">
+  {{ if $field.Error }}
+    {{ $field.Error }}
+  {{ end }}
+  {{ end }}
+</p>
+<p>
+  {{ with $field := field "t.Description" . }}
+  Description: <br>
+  <textarea name="t.Description">{{ $field.Value}}"</textarea>
+  {{ if $field.Error }}
+    {{ $field.Error }}
+  {{ end }}
+  {{ end }}
+</p>
+<button class="btn btn-Save">Save</button>

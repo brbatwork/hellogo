@@ -1,6 +1,7 @@
 {{ set . "title" "Todos" }}
 {{ template "header.html" . }}
 <div class="container">
+<a href="/todos/new" class="btn btn-info">New Todo</a>
 <ul>
   {{ range .ts }}
     <li>

@@ -5,7 +5,10 @@
 module:testrunner
 
 GET     /                                       Todos.Index
+GET     /todos/new                              Todos.New
 GET     /todos/:id                              Todos.Show
+POST    /todos/:id                              Todos.Update
+GET     /todos/:id/edit                         Todos.Edit
 GET     /todos                                  Todos.Index
 
 # Ignore favicon requests
