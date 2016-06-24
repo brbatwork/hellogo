@@ -54,3 +54,23 @@ func Test_Router_Params_Path(t *testing.T) {
     a.Contains(string(body), "PATH: " + r)
   }
 }
+
+func Benchmark_Router(b *testing.B) {
+  res := httptest.NewRecorder()
+  req, _ := http.NewRequest("GET", "/a", nil)
+
+  r := Router()
+  for i := 0; i < b.N; i++ {
+    r.ServeHTTP(res,req)
+  }
+}
+
+func Benchmark_Pat(b *testing.B) {
+  res := httptest.NewRecorder()
+  req, _ := http.NewRequest("GET", "/a", nil)
+
+  r := Pat()
+  for i := 0; i < b.N; i++ {
+    r.ServeHTTP(res,req)
+  }
+}
