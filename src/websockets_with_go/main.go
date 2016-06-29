@@ -29,11 +29,13 @@ func removeConnection(uuid string) {
 
 func sendMessage(m *Message) {
   for uuid, conn := range Connections {
-    err := conn.WriteJSON(m)
-    if err != nil {
-      log.Println(err)
-      removeConnection(uuid)
-    }
+    go func(m *Message, u string, c *websocket.Conn) {
+      err := c.WriteJSON(m)
+      if err != nil {
+        log.Println(err)
+        removeConnection(u)
+      }
+    }(m, uuid, conn)
   }
 }
 
