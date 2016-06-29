@@ -27,6 +27,16 @@ func removeConnection(uuid string) {
   delete(Connections, uuid)
 }
 
+func sendMessage(m *Message) {
+  for uuid, conn := range Connections {
+    err := conn.WriteJSON(m)
+    if err != nil {
+      log.Println(err)
+      removeConnection(uuid)
+    }
+  }
+}
+
 func getUUID()(string, error) {
   out, err := exec.Command("uuidgen").Output()
   if err != nil {
@@ -77,12 +87,7 @@ func WSHandler(res http.ResponseWriter, req *http.Request) {
     }
 
     m.UUID = uuid
-    err = conn.WriteJSON(m)
-    if err != nil {
-      log.Println(err)
-      removeConnection(uuid)
-      return
-    }
+    sendMessage(m)
   }
 }
 
