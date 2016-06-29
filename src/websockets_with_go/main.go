@@ -4,10 +4,37 @@ import (
   "net/http"
   "log"
   "github.com/negroni"
+  "os/exec"
   "github.com/gorilla/pat"
   "github.com/gorilla/websocket"
 )
 
+var Connections = map[string]*websocket.Conn{}
+
+func addConection(conn *websocket.Conn) string {
+  uuid, err := getUUID()
+
+  if err != nil {
+    log.Fatal("Problem generating uuid", err)
+  }
+
+  Connections[uuid] = conn
+  return uuid
+}
+
+func removeConnection(uuid string) {
+  log.Printf("Removing connection %s", uuid)
+  delete(Connections, uuid)
+}
+
+func getUUID()(string, error) {
+  out, err := exec.Command("uuidgen").Output()
+  if err != nil {
+    return "", err
+  }
+
+  return string(out), nil
+}
 var upgrader = websocket.Upgrader{
   ReadBufferSize: 1024,
   WriteBufferSize:1024,
@@ -16,6 +43,7 @@ var upgrader = websocket.Upgrader{
 type Message struct {
   Type string       `json:"type"`
   Data interface{}  `json:"data"`
+  UUID string       `json:"uuid"`
 }
 
 func WSHandler(res http.ResponseWriter, req *http.Request) {
@@ -25,9 +53,17 @@ func WSHandler(res http.ResponseWriter, req *http.Request) {
     return
   }
 
-  err = conn.WriteJSON(Message{Type:"welcome", Data: "Welcome to Websockets!"})
+  uuid := addConection(conn)
+
+  err = conn.WriteJSON(Message{
+    Type:"welcome",
+    Data: "Welcome to Websockets!",
+    UUID: uuid,
+  })
+
   if err != nil {
     log.Println(err)
+    removeConnection(uuid)
     return
   }
 
@@ -36,12 +72,15 @@ func WSHandler(res http.ResponseWriter, req *http.Request) {
     err = conn.ReadJSON(m)
     if err != nil {
       log.Println(err)
+      removeConnection(uuid)
       return
     }
 
+    m.UUID = uuid
     err = conn.WriteJSON(m)
     if err != nil {
       log.Println(err)
+      removeConnection(uuid)
       return
     }
   }

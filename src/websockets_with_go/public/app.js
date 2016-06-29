@@ -1,4 +1,6 @@
 $(function() {
+  var uuid = null;
+
   messageHandler = {
     goodbye: function() {
       $("h1").text("Connection has been closed!");
@@ -6,9 +8,11 @@ $(function() {
     },
     welcome: function(data) {
       $("h1").text(data.data);
+      uuid = data.uuid;
+      $("h3").text(uuid);
     },
     default: function(data) {
-      $("ul").append("<li><strong>" + data.type + ":</strong>" + data.data + "</li>");
+      $("ul").append("<li><strong>" + data.type + ":</strong> " + data.data + "<br/>UUID: " + data.uuid + "</li>");
     }
   };
 
